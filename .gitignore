@@ -1,0 +1,15 @@
+utils/GoogleNews-vectors-negative300.bin
+utils/sbw_vectors.bin
+entities/__pycache__/__init__.cpython-37.pyc
+__pycache__/app.cpython-37.pyc
+__pycache__/__init__.cpython-37.pyc
+utils/nrc_emotion_lexicon.xlsx
+app/main/utils/GoogleNews-vectors-negative300.bin
+app/main/utils/sbw_vectors.bin
+app/main/entities/__pycache__/__init__.cpython-37.pyc
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+app/main/settings.py
