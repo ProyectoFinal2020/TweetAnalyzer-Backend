@@ -27,7 +27,7 @@ class DevelopmentConfig(Config):
     # uncomment the line below to use postgres
     # SQLALCHEMY_DATABASE_URI = postgres_local_base
     # ?charset=utf8mb4
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:admin@localhost/DB_TWEETANALYZER"
+    SQLALCHEMY_DATABASE_URI = settings.SQLALCHEMY_DATABASE_URI
     DEBUG = True
 
 

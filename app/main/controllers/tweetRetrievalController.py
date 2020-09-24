@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 
 from flask import request
-# from .... import app
 from ..serializers.tweetRetrievalDto import TweetRetrievalDto
 from ..services.tweetManager.tweetManager import getTweetsFromAPI, getUserMemorySpaceInformation
 from flask_login import login_required, current_user
@@ -12,7 +11,6 @@ from flask_restplus import Resource
 api = TweetRetrievalDto.api
 userMemorySpace = TweetRetrievalDto.userMemorySpace
 twitterQuery = TweetRetrievalDto.twitterQuery
-
 
 def _getDate(date: str):
     if date:
@@ -45,23 +43,5 @@ class TweetRetrievalController(Resource):
         language = request.json['language'] if request.json['language'] else "en"
 
         tweets_dict = getTweetsFromAPI(topic_title=topic_title, search_tags=tags, maxAmount=maxAmount,
-                                       since=since, until=until, language=language)
-        filename = current_user.name + "-" + topic_title + '.json'
-        path = os.path.join("", filename)
-
-        with open(path, "w") as json_file:
-            json.dump(tweets_dict, json_file)
-
-        def uploadAndRemoveFile():
-            with open(path, "r") as file_handle:
-                yield from file_handle
-            os.remove(path)
-
-        # to do
-        # r = app.response_class(
-        #     uploadAndRemoveFile(),
-        #     mimetype='application/json',
-        #     headers={'Content-Disposition': 'attachment', 'filename': filename}
-        # )
-        # return r
-        return None
+                                       since=since, until=until, language=language) 
+        return tweets_dict

@@ -8,6 +8,7 @@ from ..auth.auth import save_user
 from ..serializers.authDto import AuthDto
 from flask_login import login_required, logout_user, current_user
 from flask_restx import Resource
+from .. import settings
 
 api = AuthDto.api
 user = AuthDto.user

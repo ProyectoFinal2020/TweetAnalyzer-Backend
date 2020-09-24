@@ -13,3 +13,4 @@ __pycache__/
 *.py[cod]
 *$py.class
 app/main/settings.py
+.vscode/settings.json

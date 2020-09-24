@@ -9,10 +9,10 @@ class UserStreamingTweets(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), primary_key=True)
     user = db.relationship(User)
     topic_title = db.Column(db.String(30), primary_key=True)
-    name = db.Column(db.Unicode(100))  # to do: collation='utf8mb4_unicode_ci'
+    name = db.Column(db.Unicode(100, collation='utf8mb4_unicode_ci'))
     username = db.Column(db.String(100))
     to = db.Column(db.String(100), nullable=True)
-    text = db.Column(db.Unicode(3000))  # to do: collation='utf8mb4_unicode_ci'
+    text = db.Column(db.Unicode(3000, collation='utf8mb4_unicode_ci'))
     retweets = db.Column(db.Integer)
     favorites = db.Column(db.Integer)
     replies = db.Column(db.Integer)

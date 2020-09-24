@@ -21,13 +21,12 @@ class ReportController(Resource):
 
     @login_required
     @api.response(201, 'Report successfully uploaded.')
-    # to do: ver como arreglarlo p q acepte el serializer
-    # @api.expect([report])
+    @api.expect([report])
     def post(self):
         """
         Saves reports in the current user account
         """
-        reports = request.json['reports']
+        reports = request.get_json()
         reportUploader = ReportUploader()
         return reportUploader.uploadReport(reports)
 
