@@ -1,4 +1,4 @@
-from ... import settings
+import os
 from ..common.data_preprocessing import tokenizer_with_lemmatizer, preprocess
 from gensim.models import KeyedVectors
 
@@ -8,7 +8,7 @@ class Jaccard:
         self.initializer = initializer
         self.most_similars_precalc = dict()
         self.wv = KeyedVectors.load_word2vec_format(
-            settings.GOOGLEWORD2VEC if initializer.getLanguage() == "en" else settings.SPANISHWORD2VEC, binary=True)
+             os.getenv('GOOGLEWORD2VEC') if initializer.getLanguage() == "en" else  os.getenv('SPANISHWORD2VEC'), binary=True)
         self.language = initializer.getLanguage()
 
     def get_most_similars(self, word):

@@ -2,7 +2,7 @@ from multiprocessing import cpu_count
 from typing import List
 
 import gensim.downloader as api
-from ... import settings
+import os
 from ...models.document_type import DocumentType
 from .data_fetching import getNews, getTweets
 from .data_preprocessing import tokenize_and_preprocess
@@ -45,7 +45,7 @@ class Initializer:
                 self.w2v_model = api.load("glove-wiki-gigaword-50")
             else:
                 self.w2v_model = KeyedVectors.load_word2vec_format(
-                    settings.SPANISHWORD2VEC, binary=True)
+                     os.getenv('SPANISHWORD2VEC'), binary=True)
         else:
             self.w2v_model = Word2Vec(self.preprocessed_documents, workers=cpu_count(),
                                       min_count=5, size=300, seed=12345)

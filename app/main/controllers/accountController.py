@@ -8,7 +8,6 @@ from ..auth.auth import save_user
 from ..serializers.authDto import AuthDto
 from flask_login import login_required, logout_user, current_user
 from flask_restx import Resource
-from .. import settings
 
 api = AuthDto.api
 user = AuthDto.user
@@ -75,7 +74,7 @@ class twitter_login(Resource):
         """
         if not current_user.is_authenticated:
             url = request.args.get(
-                'url', os.getenv('URL', settings.URL), type=str)
+                'url', os.getenv('URL'), type=str)
             url = urllib.parse.unquote(url)
             flask.session["next_url"] = url
             return redirect(url_for("twitter.login"))
@@ -92,7 +91,7 @@ class github_login(Resource):
         """
         if not current_user.is_authenticated:
             url = request.args.get(
-                'url', os.getenv('URL', settings.URL), type=str)
+                'url', os.getenv('URL'), type=str)
             url = urllib.parse.unquote(url)
             flask.session["next_url"] = url
             return redirect(url_for("github.login"))
@@ -109,7 +108,7 @@ class google_login(Resource):
         """
         if not current_user.is_authenticated:
             url = request.args.get(
-                'url', os.getenv('URL', settings.URL), type=str)
+                'url', os.getenv('URL'), type=str)
             url = urllib.parse.unquote(url)
             flask.session["next_url"] = url
             return redirect(url_for("google.login"))
@@ -126,7 +125,7 @@ class facebook_login(Resource):
         """
         if not current_user.is_authenticated:
             url = request.args.get(
-                'url', os.getenv('URL', settings.URL), type=str)
+                'url', os.getenv('URL'), type=str)
             url = urllib.parse.unquote(url)
             flask.session["next_url"] = url
             return redirect(url_for("facebook.login"))

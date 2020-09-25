@@ -1,5 +1,7 @@
-import os
+from dotenv import load_dotenv
+load_dotenv(verbose=True)
 
+import os
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
@@ -12,7 +14,6 @@ from app.main.entities.emotionLexicon import EmotionLexicon
 from app.main.entities.userStreamingTweets import UserStreamingTweets
 from app.main.entities.tweetWithScores import TweetWithScores
 from app.main.entities.tweetsTopic import TweetsTopic
-from app.main import settings
 
 app = create_app(os.getenv('ENV') or 'dev')
 
@@ -32,8 +33,8 @@ manager.add_command('db', MigrateCommand)
 @manager.command
 def run():
     if(not os.getenv('ENV')):
-        app.run(debug=settings.FLASK_DEBUG, host=settings.HOST,
-                port=settings.PORT, use_reloader=False)
+        app.run(debug=os.getenv('FLASK_DEBUG'), host=os.getenv('HOST'),
+                port=os.getenv('PORT'), use_reloader=False)
     else:
         app.run()
 

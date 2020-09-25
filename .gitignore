@@ -12,5 +12,5 @@ app/main/entities/__pycache__/__init__.cpython-37.pyc
 __pycache__/
 *.py[cod]
 *$py.class
-app/main/settings.py
 .vscode/settings.json
+.env

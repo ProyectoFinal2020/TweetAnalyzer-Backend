@@ -1,11 +1,11 @@
-from ... import settings
+import os
 from gensim.models import KeyedVectors
 
 
 class Word2VecGensim:
     def __init__(self, initializer):
         self.model = KeyedVectors.load_word2vec_format(
-            settings.GOOGLEWORD2VEC if initializer.getLanguage() == "en" else settings.SPANISHWORD2VEC, binary=True)
+             os.getenv('GOOGLEWORD2VEC') if initializer.getLanguage() == "en" else  os.getenv('SPANISHWORD2VEC'), binary=True)
         preprocessed_documents = initializer.getPreprocessedDocuments()
         self.tokenized_documents = []
         for i in range(len(preprocessed_documents)):
