@@ -8,6 +8,7 @@ RESTPLUS_VALIDATE = True
 RESTPLUS_MASK_SWAGGER = False
 RESTPLUS_ERROR_404_HELP = False
 SQLALCHEMY_ECHO = True
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 GOOGLEWORD2VEC = "app/main/utils/GoogleNews-vectors-negative300.bin"
 SPANISHWORD2VEC = "app/main/utils/sbw_vectors.bin"

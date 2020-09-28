@@ -7,6 +7,7 @@ from flask_script import Manager
 
 from app import blueprint
 from flask_cors import CORS
+from app.main import settings
 from app.main import create_app, db, login_manager
 from app.main.entities.report import Report
 from app.main.entities.user import User, OAuth
@@ -33,8 +34,8 @@ manager.add_command('db', MigrateCommand)
 @manager.command
 def run():
     if(not os.getenv('ENV')):
-        app.run(debug=os.getenv('FLASK_DEBUG'), host=os.getenv('HOST'),
-                port=os.getenv('PORT'), use_reloader=False)
+        app.run(debug=settings.FLASK_DEBUG, host=settings.HOST,
+                port=settings.PORT, use_reloader=False)
     else:
         app.run()
 
