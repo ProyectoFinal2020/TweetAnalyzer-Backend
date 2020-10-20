@@ -24,7 +24,7 @@ class TweetBuilder:
         urls = self.converter.getUrls(status)
         geo = self.converter.getGeo(status)
         img_url = self.converter.getProfileImgUrl(status)
-        sent = self.converter.getSentiment(status)
+        sent = self.converter.getEmotion(status)
 
         return UserStreamingTweets(
             user_id=current_user.id, topic_title=topic_title, id=id, name=name, username=username, to=to, text=text,
@@ -53,7 +53,7 @@ class TweetBuilder:
         tweet['geo'] = self.converter.getGeo(status)
         tweet['urls'] = self.converter.getUrls(status)
         tweet['img_url'] = self.converter.getProfileImgUrl(status)
-        sentiment = self.converter.getSentiment(status)
-        tweet['polarity'] = sentiment.polarity
-        tweet['subjectivity'] = sentiment.subjectivity
+        emotion = self.converter.getEmotion(status)
+        tweet['polarity'] = emotion.polarity
+        tweet['subjectivity'] = emotion.subjectivity
         return tweet

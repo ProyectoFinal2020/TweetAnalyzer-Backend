@@ -39,17 +39,13 @@ class Initializer:
     def initializeTfIdf(self):
         self.tfidf = TfidfModel(dictionary=self.dictionary)
 
-    def initializeModel(self, glove=True):
-        if glove:
-            if self.language == "en":
-                self.w2v_model = api.load("glove-wiki-gigaword-50")
-            else:
-                self.w2v_model = KeyedVectors.load_word2vec_format(
-                     os.getenv('SPANISHWORD2VEC'), binary=True)
+    def initializeModel(self):
+        if self.language == "en":
+            self.w2v_model = api.load("glove-wiki-gigaword-50")
         else:
-            self.w2v_model = Word2Vec(self.preprocessed_documents, workers=cpu_count(),
-                                      min_count=5, size=300, seed=12345)
-
+            self.w2v_model = KeyedVectors.load_word2vec_format(
+                    os.getenv('SPANISHWORD2VEC'), binary=True)
+                    
     def initializeSimilarityMatrix(self):
         self.similarity_index = WordEmbeddingSimilarityIndex(self.w2v_model)
         self.similarity_matrix = SparseTermSimilarityMatrix(

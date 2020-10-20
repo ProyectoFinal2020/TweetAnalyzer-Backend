@@ -6,8 +6,8 @@ from ...entities.tweetWithScores import TweetWithScores
 from ...entities.tweetsTopic import TweetsTopic
 from ...entities.userStreamingTweets import UserStreamingTweets
 from ...models.language import Language
-from ...models.sentiment import Sentiment
-from ...models.tweetAndSentiment import TweetAndSentiment
+from ...models.emotion import Emotion
+from ...models.tweetAndEmotion import TweetAndEmotion
 from ...repositories.unitOfWork import unitOfWork
 from ..common.data_preprocessing import tokenize_and_preprocess, lemmatize
 from flask_login import current_user
@@ -21,7 +21,7 @@ def getLanguage(topicTitle):
     return None
 
 
-class SentimentAnalyzer:
+class EmotionAnalyzer:
     def __init__(self):
         self.emotionLexiconRepository = unitOfWork.getEmotionLexiconRepository()
         self.emotions = ["anger", "anticipation", "disgust",
@@ -53,7 +53,7 @@ class SentimentAnalyzer:
         TweetWithEmotions.query.filter_by(
             topic_title=topicTitle, user_id=current_user.id).delete()
 
-    def analyzeSentiments(self, topicTitle, reportId, algorithm, threshold=0):
+    def analyzeEmotions(self, topicTitle, reportId, algorithm, threshold=0):
         self._clearData(topicTitle)
         language = getLanguage(topicTitle)
         tweetsWithScores = self._getTweetsWithScores(
@@ -63,15 +63,15 @@ class SentimentAnalyzer:
             tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
             tweet_lematized = [lemmatize(token, language)
                                for token in tweet_tokenized]
-            sentiments = self._getSentenceEmotion(tweet_lematized, language)
+            emotions = self._getSentenceEmotion(tweet_lematized, language)
             tweetWithEmotions = TweetWithEmotions(
                 id=tweet.id, user_id=current_user.id, topic_title=topicTitle)
-            for sentiment in sentiments:
-                setattr(tweetWithEmotions, sentiment, sentiments[sentiment])
+            for emotion in emotions:
+                setattr(tweetWithEmotions, emotion, emotions[emotion])
             db.session.merge(tweetWithEmotions)
         db.session.commit()
 
-    def analyzeSentimentsUnfiltered(self, topicTitle):
+    def analyzeEmotionsUnfiltered(self, topicTitle):
         self._clearData(topicTitle)
         language = getLanguage(topicTitle)
         userStreamingTweets = UserStreamingTweets.query. \
@@ -80,34 +80,34 @@ class SentimentAnalyzer:
             tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
             tweet_lematized = [lemmatize(token, language)
                                for token in tweet_tokenized]
-            sentiments = self._getSentenceEmotion(tweet_lematized, language)
+            emotions = self._getSentenceEmotion(tweet_lematized, language)
             tweetWithEmotions = TweetWithEmotions(
                 id=tweet.id, user_id=current_user.id, topic_title=topicTitle)
-            for sentiment in sentiments:
-                setattr(tweetWithEmotions, sentiment, sentiments[sentiment])
+            for emotion in emotions:
+                setattr(tweetWithEmotions, emotion, emotions[emotion])
             db.session.merge(tweetWithEmotions)
         db.session.commit()
 
-    def _createSentimentObject(self, tweetsWithEmotionsEntity):
+    def _createEmotionObject(self, tweetsWithEmotionsEntity):
         tweetsWithEmotions = []
         for item in tweetsWithEmotionsEntity:
-            sentiments = dict()
+            emotions = dict()
             for emotion in self.emotions:
-                sentiments[emotion] = getattr(item, emotion)
-            tweetWithSentiments = TweetAndSentiment(
-                tweet=item.userStreamingTweets, sentiment=Sentiment(sentiments))
-            tweetsWithEmotions.append(tweetWithSentiments)
+                emotions[emotion] = getattr(item, emotion)
+            tweetWithEmotions = TweetAndEmotion(
+                tweet=item.userStreamingTweets, emotion=Emotion(emotions))
+            tweetsWithEmotions.append(tweetWithEmotions)
         return tweetsWithEmotions
 
-    def getSentiments(self, per_page, page, topicTitle):
+    def getEmotions(self, per_page, page, topicTitle):
         tweetsWithEmotionsEntity = TweetWithEmotions.query.filter_by(topic_title=topicTitle,
                                                                      user_id=current_user.id).paginate(
             per_page=per_page, page=page)
-        tweetsWithEmotionsEntity.items = self._createSentimentObject(
+        tweetsWithEmotionsEntity.items = self._createEmotionObject(
             tweetsWithEmotionsEntity.items)
         return tweetsWithEmotionsEntity
 
-    def getSentimentsToDownload(self, topicTitle):
+    def getEmotionsToDownload(self, topicTitle):
         tweetsWithEmotionsEntity = TweetWithEmotions.query.filter_by(topic_title=topicTitle,
                                                                      user_id=current_user.id).all()
-        return self._createSentimentObject(tweetsWithEmotionsEntity)
+        return self._createEmotionObject(tweetsWithEmotionsEntity)

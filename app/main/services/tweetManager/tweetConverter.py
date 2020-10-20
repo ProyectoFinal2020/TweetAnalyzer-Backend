@@ -64,6 +64,6 @@ class TweetConverter:
     def getProfileImgUrl(self, status):
         return status.user.profile_image_url
 
-    def getSentiment(self, status):
+    def getEmotion(self, status):
         blob = TextBlob(status.full_text)
-        return blob.sentiment
+        return blob.emotion
