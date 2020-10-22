@@ -93,7 +93,3 @@ def deleteTweetsById(tweets):
         UserStreamingTweets.query.filter_by(
             id=tweet, user_id=current_user.id).delete()
     db.session.commit()
-
-
-def getTweetsByTopic(topic):
-    return UserStreamingTweets.query.filter_by(topic_title=topic, user_id=current_user.id).all()

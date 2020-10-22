@@ -12,3 +12,7 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 GOOGLEWORD2VEC = "app/main/utils/GoogleNews-vectors-negative300.bin"
 SPANISHWORD2VEC = "app/main/utils/sbw_vectors.bin"
+
+MIN_POLARITY_VALUE = -1
+MAX_POLARITY_VALUE = 1
+STEP_SIZE = 0.25

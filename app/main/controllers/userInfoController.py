@@ -1,9 +1,7 @@
 from flask import request
 from ..repositories.unitOfWork import unitOfWork
 from ..serializers.userInfoDto import UserInfoDto
-from ..services.tweetManager.tweetManager import getAvailableSpace, getTweetsTitles, deleteTweetsByTopicTitle, \
-    deleteTweetsById, \
-    getTweetsByTopic
+from ..services.tweetManager.tweetManager import getAvailableSpace, getTweetsTitles, deleteTweetsByTopicTitle, deleteTweetsById
 from ..services.tweetManager.tweetManager import getUserMemorySpaceInformation
 from flask_login import login_required
 from flask_restplus import Resource
@@ -46,7 +44,7 @@ class TweetRetrievalController(Resource):
         Gets all tweets belonging to a topic and the current user
         """
         topic_title = request.args.get('topic_title', "", type=str)
-        return getTweetsByTopic(topic_title)
+        return unitOfWork.userStreamingTweetsRepository.getByTopicTitle(topic_title)
 
     @login_required
     @api.response(200, 'Tweets successfully deleted.')

@@ -1,30 +1,26 @@
 from ...repositories.unitOfWork import unitOfWork
 from ...entities.userStreamingTweets import UserStreamingTweets
 from flask_login import current_user
+from ... import settings
 
 class SentimentAnalyzer:
     def __init__(self):
         self.userStreamingTweetsRepository = unitOfWork.getUserStreamingTweetsRepository()
 
-    def getSentiments(self, topic_title):
-        return self.userStreamingTweetsRepository.getByTopicTitle(topic_title)
+    def getSentimentsFilteredByPolarityValue(self, topic_title, min_polarity, max_polarity, page, per_page):
+        return self.userStreamingTweetsRepository.getPaginatedByTopicTitleInRange(per_page=per_page, page=page,\
+            topic_title=topic_title, max_polarity=max_polarity, min_polarity=min_polarity)
 
-    def getTweetCountForPolarityBuckets(self, topic_title):
+    def getTweetCountForPolarityBuckets(self, topic_title, step_size=0.25):
         tweets = self.userStreamingTweetsRepository.getByTopicTitle(topic_title)
-        aux = [0, 0, 0, 0, 0, 0, 0, 0]
-        i = 0
-        j = 0
-        max = 1
-        min = 0.75
-        while i < len(tweets): 
-            polarity = tweets[i].polarity
-            if polarity <= max and polarity >= min: 
-                aux[j] = aux[j] + 1
-                i= i+1
-            else: 
-                j= j+1
-                min -= 0.25
-                max -= 0.25
-        return aux
+        currentMinValue = settings.MIN_POLARITY_VALUE
+        currentMaxValue = currentMinValue + step_size
+        polarityBuckets = []
+        while currentMaxValue <= settings.MAX_POLARITY_VALUE: 
+            tweetsInBucket = list(filter(lambda tweet: tweet.polarity >= currentMinValue and tweet.polarity < currentMaxValue, tweets))
+            polarityBuckets.append(len(tweetsInBucket))
+            currentMaxValue += step_size
+            currentMinValue += step_size
+        return polarityBuckets
           
         

@@ -1,6 +1,5 @@
 from flask_restx import Namespace, fields
 
-
 class SentimentAnalyzerDto:
     api = Namespace('sentimentAnalyzer', description='Operations related to sentiment analysis')
     tweet = api.model('TweetWithSentiment', {
@@ -14,4 +13,11 @@ class SentimentAnalyzerDto:
         'img_url': fields.String(description='Tweets image url'),
         'polarity': fields.Float(),
         'subjectivity': fields.Float()
+    })
+    paginatedSentimentAnalyzer = api.model('PaginatedSentimentAnalyzer', {
+        'page': fields.String(description="Current page"),
+        'per_page': fields.String(description="Tweets per page"),
+        'pages': fields.String(description="Amount of pages"),
+        'total': fields.String(description="Amount of tweets"),
+        'items': fields.List(fields.Nested(tweet), description="Tweets with scores of current page")
     })
