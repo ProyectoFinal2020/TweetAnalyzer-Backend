@@ -22,3 +22,15 @@ class SentimentAnalyzerController(Resource):
         topicTitle = request.args.get('topicTitle', "", type=str)
         sentimentAnalyzer = SentimentAnalyzer()
         return sentimentAnalyzer.getSentiments(topicTitle)
+
+@api.route('/graph')
+class SentimentAnalyzerGraphController(Resource):
+    @login_required
+    @api.doc(params={'topicTitle': 'Topic Title'})
+    def get(self):
+        """
+        Returns an array of tweet numbers according to polarity buckets
+        """
+        topicTitle = request.args.get('topicTitle', "", type=str)
+        sentimentAnalyzer = SentimentAnalyzer()
+        return sentimentAnalyzer.getTweetCountForPolarityBuckets(topicTitle)
