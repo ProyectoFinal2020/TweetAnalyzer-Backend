@@ -3,12 +3,11 @@ from ..serializers.sentimentAnalyzerDto import SentimentAnalyzerDto
 from ..services.sentimentAnalyzer.sentimentAnalyzer import SentimentAnalyzer
 from flask_login import login_required
 from flask_restx import Resource
-import logging
 from .. import settings
 
 api = SentimentAnalyzerDto.api
 paginatedTweets = SentimentAnalyzerDto.paginatedSentimentAnalyzer
-log = logging.getLogger(__name__)
+tweet = SentimentAnalyzerDto.tweet
 
 
 @api.route('')
@@ -34,6 +33,20 @@ class SentimentAnalyzerController(Resource):
         max_polarity = request.args.get('max_polarity', settings.MAX_POLARITY_VALUE, type=float)
         sentimentAnalyzer = SentimentAnalyzer()
         return sentimentAnalyzer.getSentimentsFilteredByPolarityValue(topicTitle, min_polarity, max_polarity, page, per_page)
+
+@api.route('/download')
+class SentimentAnalyzerDownloadController(Resource):
+    @login_required
+    @api.doc(params={'topicTitle': 'Topic Title', 'step_size': "Size of each bucket"})
+    @api.marshal_list_with(tweet)
+    def get(self):
+        """
+        Returns a list of polarity buckets filled with tweets belonging to a topic
+        """
+        topicTitle = request.args.get('topicTitle', "", type=str)
+        step_size = request.args.get('step_size', settings.STEP_SIZE, type=float)
+        sentimentAnalyzer = SentimentAnalyzer()
+        return sentimentAnalyzer.getTweetCountForPolarityBuckets(topicTitle, step_size=step_size, includeTweets=True)       
 
 @api.route('/graph')
 class SentimentAnalyzerGraphController(Resource):

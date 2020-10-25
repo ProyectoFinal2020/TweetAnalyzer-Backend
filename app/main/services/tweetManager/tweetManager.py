@@ -6,7 +6,7 @@ from ...entities import db
 from ...entities.tweetsTopic import TweetsTopic
 from ...entities.userStreamingTweets import UserStreamingTweets
 from ...models.userMemorySpace import UserMemorySpace, TopicAndSpaceUsed
-from ..emotionAnalyzer.emotionAnalyzer import getLanguage
+from ...services.common.getLanguage import getLanguage
 from . import tweepyApi
 from .tweetBuilder import TweetBuilder
 from .tweetConverter import TweetConverter

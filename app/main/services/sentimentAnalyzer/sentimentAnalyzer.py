@@ -12,13 +12,13 @@ class SentimentAnalyzer:
         return self.userStreamingTweetsRepository.getPaginatedByTopicTitleInRange(per_page=per_page, page=page,\
             topic_title=topic_title, max_polarity=max_polarity, min_polarity=min_polarity)
     
-    def _generateBuckets(self, tweets, step_size):
+    def _generateBuckets(self, tweets, step_size, includeTweets=False):
         currentMinValue = settings.MIN_POLARITY_VALUE
         currentMaxValue = currentMinValue + step_size
         polarityBuckets = []
         while currentMaxValue <= settings.MAX_POLARITY_VALUE: 
             tweetsInBucket = list(filter(lambda tweet: tweet.polarity >= currentMinValue and tweet.polarity < currentMaxValue, tweets))
-            polarityBuckets.append(len(tweetsInBucket))
+            polarityBuckets.append(tweetsInBucket if includeTweets else len(tweetsInBucket))
             currentMaxValue += step_size
             currentMinValue += step_size
         return polarityBuckets
