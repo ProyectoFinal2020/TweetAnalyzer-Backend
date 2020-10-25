@@ -4,7 +4,6 @@ from typing import List
 import gensim.downloader as api
 import os
 from ...models.document_type import DocumentType
-from .data_fetching import getNews
 from .data_preprocessing import tokenize_and_preprocess
 from .document_summarizer import getKeywords
 from gensim import corpora
@@ -18,7 +17,7 @@ from ...repositories.unitOfWork import unitOfWork
 class Initializer:
     def __init__(self, reportId, topicTitle, language):
         self.language = language
-        self.report = getNews(reportId)
+        self.report = unitOfWork.reportRepository.getById(reportId)
         self.tweets = unitOfWork.userStreamingTweetsRepository.getByTopicTitle(topicTitle)
         self.initializeAndPreprocessDocuments(language)
         self.initializeDictionary()

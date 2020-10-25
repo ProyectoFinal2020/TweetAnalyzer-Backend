@@ -1,15 +1,13 @@
 from ...entities import db
 from ...entities.report import Report
+from ...repositories.unitOfWork import unitOfWork
 from flask_login import current_user
 from sqlalchemy.orm.exc import NoResultFound
 
 
 class ReportUploader:
-    def _buildDict(self, titles):
-        fileWithTitle = dict()
-        for title in titles:
-            fileWithTitle[title["filename"]] = title["title"]
-        return fileWithTitle
+    def __init__(self):
+        self.reportRepository = unitOfWork.reportRepository
 
     def uploadReport(self, reports):
         errors = []
@@ -17,8 +15,7 @@ class ReportUploader:
             title = report["title"]
             content = report["content"]
             language = report["language"]
-            existsDuplicates = Report.query.filter_by(
-                title=report["title"], user_id=current_user.id).count() > 0
+            existsDuplicates = self.reportRepository.getByTitle(title) != None
             if existsDuplicates:
                 errors.append(
                     'Ya existe una noticia titulada "{}"'.format(title))
@@ -35,7 +32,7 @@ class ReportUploader:
         return errors
 
     def updateReport(self, updatedReport):
-        report = Report.query.filter_by(id=updatedReport['id']).one_or_none()
+        report = self.reportRepository.getById(updatedReport['id']) 
         if report is not None:
             report.title = updatedReport['title']
             report.content = updatedReport['content']
@@ -63,9 +60,3 @@ class ReportUploader:
                 couldNotDelete.append(report)
         db.session.commit()
         return couldNotDelete
-
-    def getReportByTitle(self, title):
-        return Report.query.filter_by(title=title, user_id=current_user.id).one_or_none()
-
-    def getReportById(self, reportId):
-        return Report.query.filter_by(id=reportId, user_id=current_user.id).one_or_none()
