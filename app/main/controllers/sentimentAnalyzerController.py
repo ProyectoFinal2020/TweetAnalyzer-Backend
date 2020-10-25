@@ -26,6 +26,7 @@ class SentimentAnalyzerController(Resource):
         """
         Returns a list of all tweets with sentiments belonging to a topic
         """
+        # To-Do: falta que dependa del reportId y del algoritmo
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
         topicTitle = request.args.get('topicTitle', "", type=str)
@@ -37,12 +38,25 @@ class SentimentAnalyzerController(Resource):
 @api.route('/graph')
 class SentimentAnalyzerGraphController(Resource):
     @login_required
-    @api.doc(params={'topicTitle': 'Topic Title', 'step_size': "Size of each bucket"})
+    @api.doc(params={
+        'topicTitle': 'Topic Title', 
+        'step_size': 'Size of each bucket',
+        'reportId': 'Report id',
+        'algorithm': 'Executed algorithm',
+        'threshold': 'Threshold to comply',
+    })
     def get(self):
         """
         Returns an array of tweet numbers according to polarity buckets
         """
         topicTitle = request.args.get('topicTitle', "", type=str)
         step_size = request.args.get('step_size', settings.STEP_SIZE, type=float)
+        reportId = request.args.get('reportId', 0, type=int)
+        algorithm = request.args.get('algorithm', "", type=str)
+        threshold = request.args.get('threshold', 0, type=float)
         sentimentAnalyzer = SentimentAnalyzer()
-        return sentimentAnalyzer.getTweetCountForPolarityBuckets(topicTitle, step_size=step_size)
+        if(not reportId or reportId==0 or not algorithm or algorithm=="" or not threshold or threshold==0):
+            return sentimentAnalyzer.getTweetCountForPolarityBuckets(topicTitle, step_size=step_size)
+        else:
+            return sentimentAnalyzer.getTweetCountForPolarityBucketsFilteredBySimAlgorithm(\
+                report_id=reportId, topic_title=topicTitle, algorithm=algorithm, threshold=threshold, step_size=step_size)

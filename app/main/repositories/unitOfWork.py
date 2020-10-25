@@ -1,6 +1,8 @@
 from .emotionLexiconRepository import EmotionLexiconRepository
 from .userStreamingTweetsRepository import UserStreamingTweetsRepository
 from .tweetsTopicRepository import TweetsTopicRepository
+from .tweetWithScoresRepository import TweetWithScoresRepository
+from .tweetWithEmotionsRepository import TweetWithEmotionsRepository
 from .reportRepository import ReportRepository
 from ..utils.singleton import Singleton
 
@@ -11,6 +13,8 @@ class UnitOfWork(metaclass=Singleton):
         self.userStreamingTweetsRepository = UserStreamingTweetsRepository()
         self.tweetsTopicRepository = TweetsTopicRepository()
         self.reportRepository = ReportRepository()
+        self.tweetWithScoresRepository = TweetWithScoresRepository()
+        self.tweetWithEmotionsRepository = TweetWithEmotionsRepository()
 
     def getEmotionLexiconRepository(self):
         return self.emotionLexiconRepository
@@ -23,6 +27,12 @@ class UnitOfWork(metaclass=Singleton):
 
     def getReportRepository(self):
         return self.reportRepository
+
+    def getTweetWithScoresRepository(self):
+        return self.tweetWithScoresRepository
+
+    def getTweetWithEmotionsRepository(self):
+        return self.tweetWithEmotionsRepository
 
 
 unitOfWork = UnitOfWork()

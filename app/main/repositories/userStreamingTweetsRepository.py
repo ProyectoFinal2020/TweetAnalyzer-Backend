@@ -13,7 +13,8 @@ class UserStreamingTweetsRepository(BaseRepository[UserStreamingTweets]):
     def getPaginatedByTopicTitleInRange(self, per_page, page, topic_title, min_polarity, max_polarity):
         return self.model.query.filter(UserStreamingTweets.topic_title==topic_title, \
                 UserStreamingTweets.user_id==current_user.id,\
-                UserStreamingTweets.polarity.between(min_polarity, max_polarity))\
+                UserStreamingTweets.polarity>=min_polarity, \
+                UserStreamingTweets.polarity<max_polarity) \
             .order_by(UserStreamingTweets.polarity.desc())\
             .paginate(per_page=per_page, page=page)
 
