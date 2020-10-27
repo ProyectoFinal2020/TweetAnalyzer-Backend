@@ -14,6 +14,16 @@ class SentimentAnalyzerDto:
         'polarity': fields.Float(),
         'subjectivity': fields.Float()
     })
+    sentimentBucket = api.model('SentimentBucket', {
+        'min_value': fields.Float(),
+        'max_value': fields.Float(),
+        'tweets_amount': fields.Integer(description="Amount of tweets with scores between min and max value")
+    })
+    sentimentBucketWithTweets = api.model('SentimentBucketWithTweets', {
+        'min_value': fields.Float(),
+        'max_value': fields.Float(),
+        'tweets': fields.List(fields.Nested(tweet), description="Tweets with scores between min and max value")
+    })
     paginatedSentimentAnalyzer = api.model('PaginatedSentimentAnalyzer', {
         'page': fields.String(description="Current page"),
         'per_page': fields.String(description="Tweets per page"),

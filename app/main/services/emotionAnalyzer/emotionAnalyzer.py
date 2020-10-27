@@ -40,7 +40,7 @@ class EmotionAnalyzer:
         return collections.Counter(tokens_emotions)
 
     def _clearData(self, topicTitle):
-        self.tweetWithEmotionsRepository.getTweetsByTopicTitle(topicTitle=topicTitle).delete()
+        self.tweetWithEmotionsRepository.getTweetsByTopicTitle(topic_title=topicTitle).delete()
 
     def analyzeEmotions(self, topicTitle, reportId, algorithm, threshold=0):
         self._clearData(topicTitle)
@@ -93,5 +93,5 @@ class EmotionAnalyzer:
         return tweetsWithEmotionsEntity
 
     def getEmotionsToDownload(self, topicTitle):
-        tweetsWithEmotionsEntity = self.tweetWithEmotionsRepository.getTweetsByTopicTitle(topicTitle)
+        tweetsWithEmotionsEntity = self.tweetWithEmotionsRepository.getAllTweetsByTopicTitle(topicTitle)
         return self._createEmotionObject(tweetsWithEmotionsEntity)

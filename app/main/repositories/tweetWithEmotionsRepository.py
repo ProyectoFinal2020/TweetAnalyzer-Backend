@@ -7,9 +7,11 @@ class TweetWithEmotionsRepository(BaseRepository[TweetWithEmotions]):
     def __init__(self):
         super().__init__(TweetWithEmotions)
 
-    def getTweetsByTopicTitle(self,topicTitle):
-        # To-Do: ver que funca el clear en emotionAnalyzer
-        return self.model.query.filter_by(topic_title=topicTitle, user_id=current_user.id).all()
+    def getAllTweetsByTopicTitle(self, topic_title):
+        return self.model.query.filter_by(topic_title=topic_title, user_id=current_user.id).all()
+    
+    def getTweetsByTopicTitle(self, topic_title):
+        return self.model.query.filter_by(topic_title=topic_title, user_id=current_user.id)
 
     def getPaginatedTweetsByTopicTitle(self, topicTitle, page, per_page):
         return self.model.query.filter_by(topic_title=topicTitle, user_id=current_user.id).paginate(per_page=per_page, page=page)

@@ -1,4 +1,5 @@
 from ..entities.userStreamingTweets import UserStreamingTweets
+from ..entities.tweetWithScores import TweetWithScores
 from .baseRepository import BaseRepository
 from flask_login import current_user
 
@@ -20,3 +21,12 @@ class UserStreamingTweetsRepository(BaseRepository[UserStreamingTweets]):
 
     def getPaginatedByTopicTitle(self, per_page, page, topic_title):
         return self.model.query.filter_by(topic_title=topic_title, user_id=current_user.id).paginate(per_page=per_page, page=page)
+
+    def getUserStreamingTweetsPaginated(self, topic_title, min_polarity, max_polarity, reportId, algorithm, threshold, per_page, page):
+        return self.model.query.filter(UserStreamingTweets.topic_title==topic_title, \
+                UserStreamingTweets.user_id==current_user.id,\
+                UserStreamingTweets.polarity>=min_polarity, \
+                UserStreamingTweets.polarity<max_polarity) \
+            .join(TweetWithScores) \
+            .filter(TweetWithScores.report_id == reportId, getattr(TweetWithScores, algorithm) >= threshold) \
+            .paginate(per_page=per_page, page=page) 
