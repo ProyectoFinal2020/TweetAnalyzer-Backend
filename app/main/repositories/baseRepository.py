@@ -7,7 +7,7 @@ class BaseRepository(Generic[T]):
     def __init__(self, model):
         self.model = model
 
-    def get(self):
+    def getAll(self):
         return self.model.query.all()
 
     def getPaginated(self, per_page, page):

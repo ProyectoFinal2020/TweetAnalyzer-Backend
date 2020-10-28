@@ -4,13 +4,16 @@ from datetime import datetime
 
 from flask import request
 from ..serializers.tweetRetrievalDto import TweetRetrievalDto
-from ..services.tweetManager.tweetManager import getTweetsFromAPI, getUserMemorySpaceInformation
+from ..services.tweetManager.tweetManager import TweetsService
+from ..utils.tweetAnalyzerException import TweetAnalyzerException
 from flask_login import login_required, current_user
 from flask_restplus import Resource
 
 api = TweetRetrievalDto.api
 userMemorySpace = TweetRetrievalDto.userMemorySpace
 twitterQuery = TweetRetrievalDto.twitterQuery
+
+ts = TweetsService()
 
 def _getDate(date: str):
     if date:
@@ -27,7 +30,7 @@ class TweetRetrievalController(Resource):
         """
         Gets the available space and the space used by the current user
         """
-        return getUserMemorySpaceInformation()
+        return ts.getUserMemorySpaceInformation()
 
     @login_required
     @api.expect(twitterQuery)
@@ -42,6 +45,9 @@ class TweetRetrievalController(Resource):
         until = _getDate(request.json['until'])
         language = request.json['language'] if request.json['language'] else "en"
 
-        tweets_dict = getTweetsFromAPI(topic_title=topic_title, search_tags=tags, maxAmount=maxAmount,
-                                       since=since, until=until, language=language) 
-        return tweets_dict
+        try:
+            tweets_dict = ts.getTweetsFromAPI(topic_title=topic_title, search_tags=tags, maxAmount=maxAmount,
+                                        since=since, until=until, language=language) 
+            return tweets_dict
+        except TweetAnalyzerException:
+            return 'El tema de los tweets ya existe para otro idioma.', 400

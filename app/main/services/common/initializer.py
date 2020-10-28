@@ -18,7 +18,7 @@ class Initializer:
     def __init__(self, reportId, topicTitle, language):
         self.language = language
         self.report = unitOfWork.reportRepository.getById(reportId).content
-        self.tweets = unitOfWork.userStreamingTweetsRepository.getByTopicTitle(topicTitle)
+        self.tweets = unitOfWork.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
         self.initializeAndPreprocessDocuments(language)
         self.initializeDictionary()
         self.initializeTfIdf()

@@ -66,4 +66,4 @@ class TweetConverter:
 
     def getEmotion(self, status):
         blob = TextBlob(status.full_text)
-        return blob.emotion
+        return blob.sentiment

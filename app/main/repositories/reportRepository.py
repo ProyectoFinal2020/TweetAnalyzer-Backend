@@ -9,3 +9,6 @@ class ReportRepository(BaseRepository[Report]):
 
     def getByTitle(self, title):
         return Report.query.filter_by(title=title, user_id=current_user.id).one_or_none()
+
+    def getAllOrderedByTitle(self):
+        return self.model.query.filter_by(user_id=current_user.id).order_by(Report.title).all()

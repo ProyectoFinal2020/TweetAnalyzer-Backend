@@ -6,6 +6,7 @@ from flask_restx import Resource
 
 api = ReportDto.api
 report = ReportDto.report
+reportsDelete = ReportDto.reportsDelete
 
 
 @api.route('')
@@ -43,12 +44,13 @@ class ReportController(Resource):
         return None, 400
 
     @login_required
+    @api.expect(reportsDelete)
     @api.response(200, 'Reports successfully deleted.')
-    @api.expect([int])
     def delete(self):
         """
         Deletes a list of reports belonging to the current user
         """
         reports = request.json['reports']
         reportUploader = ReportUploader()
-        return reportUploader.deleteReports(reports)
+        reportUploader.deleteReports(reports)
+        return None, 200

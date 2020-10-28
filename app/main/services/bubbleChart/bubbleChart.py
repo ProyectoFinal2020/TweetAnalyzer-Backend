@@ -9,7 +9,7 @@ class BubbleChart:
         self.userStreamingTweetsRepository = unitOfWork.getUserStreamingTweetsRepository()
 
     def getWordsCount(self, topic_title):
-        tweets = self.userStreamingTweetsRepository.getByTopicTitle(topic_title)
+        tweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topic_title)
         language = getLanguage(topic_title)
         wordsCount = {}
         for tweet in tweets:

@@ -41,11 +41,12 @@ class EmotionAnalyzer:
 
     def _clearData(self, topicTitle):
         self.tweetWithEmotionsRepository.getTweetsByTopicTitle(topic_title=topicTitle).delete()
+        db.session.commit()
 
     def analyzeEmotions(self, topicTitle, reportId, algorithm, threshold=0):
         self._clearData(topicTitle)
         language = getLanguage(topicTitle)
-        tweetsWithScores = self.tweetWithScoresRepository.getTweetsWithScores(
+        tweetsWithScores = self.tweetWithScoresRepository.getAllTweetsWithScoresFilteredByThreshold(
             topicTitle, reportId, algorithm, threshold)
         for tweetWithScores in tweetsWithScores:
             tweet = tweetWithScores.userStreamingTweets
@@ -63,7 +64,7 @@ class EmotionAnalyzer:
     def analyzeEmotionsUnfiltered(self, topicTitle):
         self._clearData(topicTitle)
         language = getLanguage(topicTitle)
-        userStreamingTweets = self.userStreamingTweetsRepository.getByTopicTitle(topicTitle)
+        userStreamingTweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
         for tweet in userStreamingTweets:
             tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
             tweet_lematized = [lemmatize(token, language)
