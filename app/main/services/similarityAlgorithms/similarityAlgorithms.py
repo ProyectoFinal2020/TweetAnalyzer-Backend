@@ -2,9 +2,6 @@ from ...entities import db
 from ...entities.tweetWithScores import TweetWithScores as TweetWithScoresEntity
 from ...models.TweetWithScores import TweetWithScores
 from ..common.initializer import Initializer
-from .TweetWithScoresQueries import \
-    getTweetsWithScoresEntityOrderedByTextDesc, getTweetsWithScoresEntityOrderedByText, \
-    getTweetsWithScoresEntityOrderedByPropDesc, getTweetsWithScoresEntityOrderedByProp
 from .bag_of_words import BagOfWords
 from .doc2vec import Doc2VecN_Sim
 from .doc2vec_gensim import Doc2VecGensim
@@ -15,10 +12,13 @@ from .wmd import Wmd
 from .word2vec_gensim import Word2VecGensim
 from flask_login import current_user
 
+from ...repositories.unitOfWork import unitOfWork
+
 
 class SimilarityAlgorithms:
     def __init__(self):
         self.algorithm_names = self.initializeDictionary()
+        self.tweetWithScoresRepository = unitOfWork.getTweetWithScoresRepository()
 
     def initializeDictionary(self):
         return {
@@ -50,15 +50,9 @@ class SimilarityAlgorithms:
 
     def _getTweetsWithScoresEntity(self, per_page, page, orderBy, desc, topicTitle, reportId):
         if orderBy == 'Tweet':
-            if desc:
-                return getTweetsWithScoresEntityOrderedByTextDesc(per_page, page, topicTitle, reportId)
-            else:
-                return getTweetsWithScoresEntityOrderedByText(per_page, page, topicTitle, reportId)
+            return self.tweetWithScoresRepository.getTweetsWithScoresOrderedByText(topicTitle, reportId, desc, per_page, page)
         else:
-            if desc:
-                return getTweetsWithScoresEntityOrderedByPropDesc(per_page, page, orderBy, topicTitle, reportId)
-            else:
-                return getTweetsWithScoresEntityOrderedByProp(per_page, page, orderBy, topicTitle, reportId)
+            return self.tweetWithScoresRepository.getTweetsWithScoresOrderedByProp(topicTitle, reportId, orderBy, desc, per_page, page)
 
     def _createScoresObject(self, tweetsWithScoresEntity, algorithms):
         tweetsWithScores = []
@@ -80,8 +74,7 @@ class SimilarityAlgorithms:
         return tweetsWithScoresEntity
 
     def get_tweets_to_download(self, topicTitle, reportId, algorithms):
-        tweetsWithScoresEntity = TweetWithScoresEntity.query.filter_by(topic_title=topicTitle, report_id=reportId,
-                                                                       user_id=current_user.id).all()
+        tweetsWithScoresEntity = self.tweetWithScoresRepository.getAllTweetsWithScores(topicTitle, reportId)
         return self._createScoresObject(tweetsWithScoresEntity, algorithms)
 
     def bag_of_words_initializer(self, initializer):

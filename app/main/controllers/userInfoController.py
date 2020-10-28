@@ -1,8 +1,7 @@
 from flask import request
 from ..repositories.unitOfWork import unitOfWork
 from ..serializers.userInfoDto import UserInfoDto
-from ..services.tweetManager.tweetManager import getAvailableSpace, getTweetsTitles, deleteTweetsByTopicTitle, deleteTweetsById
-from ..services.tweetManager.tweetManager import getUserMemorySpaceInformation
+from ..services.tweetManager.tweetManager import TweetsService
 from flask_login import login_required
 from flask_restplus import Resource
 
@@ -12,6 +11,7 @@ tweetTitle = UserInfoDto.tweetTitle
 tweet = UserInfoDto.tweet
 userMemorySpace = UserInfoDto.userMemorySpace
 
+tweetsService = TweetsService()
 
 @api.route("/info")
 class TweetRetrievalController(Resource):
@@ -21,7 +21,7 @@ class TweetRetrievalController(Resource):
         """
         Gets the available space and the space used by the current user
         """
-        return getUserMemorySpaceInformation()
+        return tweetsService.getUserMemorySpaceInformation()
 
 
 @api.route("/availableSpace")
@@ -31,7 +31,7 @@ class TweetRetrievalController(Resource):
         """
         Gets the available space of the current user
         """
-        return getAvailableSpace()
+        return tweetsService.getAvailableSpace()
 
 
 @api.route("/tweets")
@@ -44,7 +44,7 @@ class TweetRetrievalController(Resource):
         Gets all tweets belonging to a topic and the current user
         """
         topic_title = request.args.get('topic_title', "", type=str)
-        return unitOfWork.userStreamingTweetsRepository.getByTopicTitle(topic_title)
+        return unitOfWork.userStreamingTweetsRepository.getAllByTopicTitle(topic_title)
 
     @login_required
     @api.response(200, 'Tweets successfully deleted.')
@@ -54,7 +54,7 @@ class TweetRetrievalController(Resource):
         Deletes a set of tweets by id associated with the current user
         """
         tweets = request.json['tweets']
-        deleteTweetsById(tweets)
+        tweetsService.deleteTweetsById(tweets)
 
 
 @api.route("/tweets/topics")
@@ -65,7 +65,7 @@ class TweetTopicController(Resource):
         """
         Gets all the topic titles belonging to the current user
         """
-        return getTweetsTitles()
+        return unitOfWork.getTweetsTopicRepository().getAllOrderedByTitle()
 
     @login_required
     @api.response(200, 'Tweets from topics successfully deleted.')
@@ -76,8 +76,8 @@ class TweetTopicController(Resource):
         Deletes the tweet topics belonging to the current user
         """
         topics = request.json['topics']
-        deleteTweetsByTopicTitle(topics=topics)
-        return getUserMemorySpaceInformation()
+        tweetsService.deleteTweetsByTopicTitle(topics=topics)
+        return tweetsService.getUserMemorySpaceInformation()
 
 
 @api.route("/tweets/paginated")

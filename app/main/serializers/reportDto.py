@@ -9,3 +9,6 @@ class ReportDto:
         'content': fields.String(required=True, description="Content of the report"),
         'language': fields.String(required=True, description="Language of the report")
     })
+    reportsDelete = api.model('ReportsDelete', {
+        'reports': fields.List(fields.Integer())
+    })

@@ -11,7 +11,7 @@ class SentimentAnalyzer:
 
     def getSentimentsFilteredByPolarityValueAndThreshold(self, topic_title, min_polarity, max_polarity, page, per_page, report_id, algorithm, threshold):
         return self.userStreamingTweetsRepository.\
-            getUserStreamingTweetsPaginated(topic_title=topic_title, max_polarity=max_polarity, min_polarity=min_polarity, \
+            getPaginatedByPolarity(topic_title=topic_title, max_polarity=max_polarity, min_polarity=min_polarity, \
                 reportId=report_id, algorithm=algorithm, threshold=threshold, per_page=per_page, page=page)
 
     def getSentimentsFilteredByPolarityValue(self, topic_title, min_polarity, max_polarity, page, per_page):
@@ -37,12 +37,12 @@ class SentimentAnalyzer:
 
     def getTweetCountForPolarityBucketsFilteredBySimAlgorithm(self, report_id, topic_title, algorithm, threshold, step_size=0.25, includeTweets=False):
         tweetsWithScores = self.tweetWithScoresRepository.\
-            getTweetsWithScores(topicTitle=topic_title, reportId=report_id, algorithm=algorithm, threshold=threshold)
+            getAllTweetsWithScoresFilteredByThreshold(topicTitle=topic_title, reportId=report_id, algorithm=algorithm, threshold=threshold)
         tweets = [tweetWithScores.userStreamingTweets for tweetWithScores in tweetsWithScores]
         return self._generateBuckets(tweets, step_size, includeTweets)
 
     def getTweetCountForPolarityBuckets(self, topic_title, step_size=0.25, includeTweets=False):
-        tweets = self.userStreamingTweetsRepository.getByTopicTitle(topic_title=topic_title)
+        tweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topic_title=topic_title)
         return self._generateBuckets(tweets, step_size, includeTweets)
           
         

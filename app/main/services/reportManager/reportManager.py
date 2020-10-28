@@ -7,7 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 class ReportUploader:
     def __init__(self):
-        self.reportRepository = unitOfWork.reportRepository
+        self.reportRepository = unitOfWork.getReportRepository()
 
     def uploadReport(self, reports):
         errors = []
@@ -42,21 +42,13 @@ class ReportUploader:
         return False
 
     def getAllReportsFromUser(self):
-        query = Report.query.filter_by(
-            user_id=current_user.id).order_by(Report.title)
         try:
-            reports = query.all()
-            return reports
+            return self.reportRepository.getAllOrderedByTitle()
         except NoResultFound:
-            pass
+            return None
 
-    def deleteReports(self, reports):
-        couldNotDelete = []
-        for report in reports:
-            try:
-                db.session.delete(Report.query.filter_by(
-                    id=report, user_id=current_user.id).one())
-            except NoResultFound:
-                couldNotDelete.append(report)
+    def deleteReports(self, reportsIds):
+        for reportId in reportsIds:
+            report = self.reportRepository.getById(id=reportId)
+            db.session.delete(report) if report is not None else None
         db.session.commit()
-        return couldNotDelete
