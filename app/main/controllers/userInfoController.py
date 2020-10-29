@@ -1,7 +1,7 @@
 from flask import request
 from ..repositories.unitOfWork import unitOfWork
 from ..serializers.userInfoDto import UserInfoDto
-from ..services.tweetManager.tweetManager import TweetsService
+from ..services.tweetService.tweetService import TweetsService
 from flask_login import login_required
 from flask_restplus import Resource
 

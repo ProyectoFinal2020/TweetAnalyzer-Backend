@@ -2,7 +2,6 @@ from ..entities.tweetWithEmotions import TweetWithEmotions
 from .baseRepository import BaseRepository
 from flask_login import current_user
 
-# to-do: si el rango tiene como maxValue el MAX_POLARITY entonces tiene que incluir dicho valor!!!!! 
 class TweetWithEmotionsRepository(BaseRepository[TweetWithEmotions]):
     def __init__(self):
         super().__init__(TweetWithEmotions)

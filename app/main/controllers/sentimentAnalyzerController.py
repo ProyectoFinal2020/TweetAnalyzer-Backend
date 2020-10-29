@@ -3,7 +3,7 @@ from ..serializers.sentimentAnalyzerDto import SentimentAnalyzerDto
 from ..services.sentimentAnalyzer.sentimentAnalyzer import SentimentAnalyzer
 from flask_login import login_required
 from flask_restx import Resource
-from .. import settings
+from ..settings import MAX_POLARITY_VALUE, MIN_POLARITY_VALUE, STEP_SIZE
 
 api = SentimentAnalyzerDto.api
 paginatedTweets = SentimentAnalyzerDto.paginatedSentimentAnalyzer
@@ -33,8 +33,8 @@ class SentimentAnalyzerController(Resource):
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
         topicTitle = request.args.get('topicTitle', "", type=str)
-        min_polarity = request.args.get('min_polarity', settings.MIN_POLARITY_VALUE, type=float)
-        max_polarity = request.args.get('max_polarity', settings.MAX_POLARITY_VALUE, type=float)
+        min_polarity = request.args.get('min_polarity', MIN_POLARITY_VALUE, type=float)
+        max_polarity = request.args.get('max_polarity', MAX_POLARITY_VALUE, type=float)
         reportId = request.args.get('reportId', None, type=int)
         algorithm = request.args.get('algorithm', None, type=str)
         threshold = request.args.get('threshold', None, type=float)
@@ -64,7 +64,7 @@ class SentimentAnalyzerDownloadController(Resource):
         If some field isn't defined, returns a list of polarity buckets filled with tweets belonging to a topic.
         """
         topicTitle = request.args.get('topicTitle', "", type=str)
-        step_size = request.args.get('step_size', settings.STEP_SIZE, type=float)
+        step_size = request.args.get('step_size', STEP_SIZE, type=float)
         reportId = request.args.get('reportId', None, type=int)
         algorithm = request.args.get('algorithm', None, type=str)
         threshold = request.args.get('threshold', None, type=float)
@@ -93,7 +93,7 @@ class SentimentAnalyzerGraphController(Resource):
         If some field isn't defined, returns an array of tweet numbers according to polarity buckets filtering by topic title.
         """
         topicTitle = request.args.get('topicTitle', "", type=str)
-        step_size = request.args.get('step_size', settings.STEP_SIZE, type=float)
+        step_size = request.args.get('step_size', STEP_SIZE, type=float)
         reportId = request.args.get('reportId', None, type=int)
         algorithm = request.args.get('algorithm', None, type=str)
         threshold = request.args.get('threshold', None, type=float)

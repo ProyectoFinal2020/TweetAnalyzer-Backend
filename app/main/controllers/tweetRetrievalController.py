@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import request
 from ..serializers.tweetRetrievalDto import TweetRetrievalDto
-from ..services.tweetManager.tweetManager import TweetsService
+from ..services.tweetService.tweetService import TweetsService
 from ..utils.tweetAnalyzerException import TweetAnalyzerException
 from flask_login import login_required, current_user
 from flask_restplus import Resource

@@ -18,6 +18,9 @@ class SentimentAnalyzer:
         return self.userStreamingTweetsRepository.getPaginatedByTopicTitleInRange(per_page=per_page, page=page,\
             topic_title=topic_title, max_polarity=max_polarity, min_polarity=min_polarity)
     
+    def _isPolarityLessThanMaxValue(self, tweet, currentMaxValue):
+        return tweet.polarity<=currentMaxValue if currentMaxValue==settings.MAX_POLARITY_VALUE else tweet.polarity<currentMaxValue
+
     def _generateBucket(self, min_value, max_value, tweets, includeTweets):
         if includeTweets:
             return SentimentBucketWithTweets(min_value=min_value, max_value=max_value, tweets=tweets)
@@ -29,7 +32,7 @@ class SentimentAnalyzer:
         currentMaxValue = currentMinValue + step_size
         polarityBuckets = []
         while currentMaxValue <= float(settings.MAX_POLARITY_VALUE): 
-            tweetsInBucket = list(filter(lambda tweet: tweet.polarity >= currentMinValue and tweet.polarity < currentMaxValue, tweets))
+            tweetsInBucket = list(filter(lambda tweet: tweet.polarity >= currentMinValue and self._isPolarityLessThanMaxValue(tweet,currentMaxValue), tweets))
             polarityBuckets.append(self._generateBucket(min_value=currentMinValue, max_value=currentMaxValue, tweets=tweetsInBucket, includeTweets=includeTweets))
             currentMaxValue += step_size
             currentMinValue += step_size

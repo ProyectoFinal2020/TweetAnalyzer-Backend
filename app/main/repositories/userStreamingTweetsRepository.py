@@ -2,7 +2,7 @@ from ..entities.userStreamingTweets import UserStreamingTweets
 from ..entities.tweetWithScores import TweetWithScores
 from .baseRepository import BaseRepository
 from flask_login import current_user
-
+from ..settings import MAX_POLARITY_VALUE
 
 class UserStreamingTweetsRepository(BaseRepository[UserStreamingTweets]):
     def __init__(self):
@@ -27,7 +27,7 @@ class UserStreamingTweetsRepository(BaseRepository[UserStreamingTweets]):
         return self.model.query.filter(UserStreamingTweets.topic_title==topic_title, \
                 UserStreamingTweets.user_id==current_user.id,\
                 UserStreamingTweets.polarity>=min_polarity, \
-                UserStreamingTweets.polarity<max_polarity) \
+                UserStreamingTweets.polarity<=max_polarity if max_polarity==MAX_POLARITY_VALUE else UserStreamingTweets.polarity<max_polarity) \
             .order_by(UserStreamingTweets.polarity.desc())\
             .paginate(per_page=per_page, page=page)
 
@@ -38,7 +38,7 @@ class UserStreamingTweetsRepository(BaseRepository[UserStreamingTweets]):
         return self.model.query.filter(UserStreamingTweets.topic_title==topic_title, \
                 UserStreamingTweets.user_id==current_user.id,\
                 UserStreamingTweets.polarity>=min_polarity, \
-                UserStreamingTweets.polarity<max_polarity) \
+                UserStreamingTweets.polarity<=max_polarity if max_polarity==MAX_POLARITY_VALUE else UserStreamingTweets.polarity<max_polarity) \
             .join(TweetWithScores) \
             .filter(TweetWithScores.report_id == reportId, getattr(TweetWithScores, algorithm) >= threshold) \
             .paginate(per_page=per_page, page=page) 
