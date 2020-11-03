@@ -4,7 +4,7 @@ from flask_login import current_user
 from ..common.getLanguage import getLanguage
 from ...services.common.data_preprocessing import tokenize_and_preprocess, lemmatize
 
-class BubbleChart:
+class FrequencyAnalyzer:
     def __init__(self):
         self.userStreamingTweetsRepository = unitOfWork.getUserStreamingTweetsRepository()
 
@@ -23,4 +23,15 @@ class BubbleChart:
                     wordsCount[lemma] = 1
                     
         return wordsCount
-            
+
+    def getHashtagsCount(self, topic_title):
+        tweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topic_title)
+        hashtagsCount = {}
+        for tweet in tweets:
+            hashtags = tweet.hashtags.replace('#','').split()
+            for hashtag in hashtags:
+                try:
+                    hashtagsCount[hashtag] = hashtagsCount[hashtag] +1
+                except KeyError:
+                    hashtagsCount[hashtag] = 1
+        return hashtagsCount
