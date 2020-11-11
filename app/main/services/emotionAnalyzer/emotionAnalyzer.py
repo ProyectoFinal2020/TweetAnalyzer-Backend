@@ -12,6 +12,8 @@ from ..common.data_preprocessing import tokenize_and_preprocess, lemmatize
 from flask_login import current_user
 from ..common.getLanguage import getLanguage
 
+import json
+
 
 class EmotionAnalyzer:
     def __init__(self):
@@ -46,26 +48,14 @@ class EmotionAnalyzer:
     def analyzeEmotions(self, topicTitle, reportId, algorithm, threshold=0):
         self._clearData(topicTitle)
         language = getLanguage(topicTitle)
-        tweetsWithScores = self.tweetWithScoresRepository.getAllTweetsWithScoresFilteredByThreshold(
-            topicTitle, reportId, algorithm, threshold)
-        for tweetWithScores in tweetsWithScores:
-            tweet = tweetWithScores.userStreamingTweets
-            tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
-            tweet_lematized = [lemmatize(token, language)
-                               for token in tweet_tokenized]
-            emotions = self._getSentenceEmotion(tweet_lematized, language)
-            tweetWithEmotions = TweetWithEmotions(
-                id=tweet.id, user_id=current_user.id, topic_title=topicTitle)
-            for emotion in emotions:
-                setattr(tweetWithEmotions, emotion, emotions[emotion])
-            db.session.merge(tweetWithEmotions)
-        db.session.commit()
-
-    def analyzeEmotionsUnfiltered(self, topicTitle):
-        self._clearData(topicTitle)
-        language = getLanguage(topicTitle)
-        userStreamingTweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
+        if(not reportId or not algorithm or not threshold):
+            userStreamingTweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
+        else:
+            userStreamingTweets = self.tweetWithScoresRepository.getAllTweetsWithScoresFilteredByThreshold(
+                topicTitle, reportId, algorithm, threshold)
         for tweet in userStreamingTweets:
+            if (reportId and algorithm and threshold):
+                tweet = tweet.userStreamingTweets
             tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
             tweet_lematized = [lemmatize(token, language)
                                for token in tweet_tokenized]
@@ -96,3 +86,35 @@ class EmotionAnalyzer:
     def getEmotionsToDownload(self, topicTitle):
         tweetsWithEmotionsEntity = self.tweetWithEmotionsRepository.getAllTweetsByTopicTitle(topicTitle)
         return self._createEmotionObject(tweetsWithEmotionsEntity)
+
+    def _buildLemmasDict(self, language, topicTitle, reportId, algorithm, threshold):
+        lemmas_dict = {}
+        if(reportId == 0 or algorithm == "" or threshold == 0):
+            userStreamingTweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
+        else:
+            userStreamingTweets = self.tweetWithScoresRepository.getAllTweetsWithScoresFilteredByThreshold(topicTitle, reportId, algorithm, threshold)
+        for tweet in userStreamingTweets:
+            if (reportId != 0 and algorithm != "" and threshold != 0):
+                tweet = tweet.userStreamingTweets
+            tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
+            for token in tweet_tokenized:
+                lemma = lemmatize(token, language)
+                try:
+                    lemmas_dict[lemma] = lemmas_dict[lemma] + 1                 
+                except KeyError:
+                    lemmas_dict[lemma] = 1
+        return lemmas_dict
+
+    def getEmotionsOfATopic(self, topicTitle, reportId, algorithm, threshold):
+        language = getLanguage(topicTitle)
+        lemmas_dict = self._buildLemmasDict(language, topicTitle, reportId, algorithm, threshold)
+        lemmas_emotions_dict = {}
+        for emotion in self.emotions:
+            lemmas_emotions_dict[emotion] = 0
+        words_with_emotions = self.emotionLexiconRepository.getEmotionsOfATopic(lemmas_dict.keys(), self.languageDict[language])
+        for word in words_with_emotions:
+            frequency =  lemmas_dict[word.english]
+            for attr, value in word.__dict__.items():
+                if (attr in self.emotions) and (value == 1):
+                    lemmas_emotions_dict[attr] = lemmas_emotions_dict[attr] + frequency
+        return lemmas_emotions_dict
