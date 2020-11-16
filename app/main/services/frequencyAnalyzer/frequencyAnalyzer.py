@@ -3,6 +3,7 @@ from ...entities.userStreamingTweets import UserStreamingTweets
 from flask_login import current_user
 from ..common.getLanguage import getLanguage
 from ...services.common.data_preprocessing import tokenize_and_preprocess, lemmatize
+from .frequencyAnalyzerMerger import merge
 
 class FrequencyAnalyzer:
     def __init__(self):
@@ -21,17 +22,16 @@ class FrequencyAnalyzer:
                     wordsCount[lemma] = wordsCount[lemma] + 1                 
                 except KeyError:
                     wordsCount[lemma] = 1
-                    
-        return wordsCount
+        return merge(wordsCount)
 
     def getHashtagsCount(self, topic_title):
         tweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topic_title)
         hashtagsCount = {}
         for tweet in tweets:
-            hashtags = tweet.hashtags.replace('#','').split()
+            hashtags = tweet.hashtags.split()
             for hashtag in hashtags:
-                try:
+                if hashtag in hashtagsCount:
                     hashtagsCount[hashtag] = hashtagsCount[hashtag] +1
-                except KeyError:
+                else:
                     hashtagsCount[hashtag] = 1
-        return hashtagsCount
+        return merge(hashtagsCount)
