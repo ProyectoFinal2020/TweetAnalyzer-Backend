@@ -10,6 +10,10 @@ class EmotionLexiconRepository(BaseRepository[EmotionLexicon]):
             Language.ENGLISH: self._getEmotionsEnglish,
             Language.SPANISH: self._getEmotionsSpanish,
         }
+        self.getEmotionsByLanguageAndTopic = {
+            Language.ENGLISH: self._getEmotionsOfATopicInEnglish,
+            Language.SPANISH: self._getEmotionsOfATopicInSpanish,
+        }
 
     def getEmotions(self, word: str, language: Language):
         return self.getEmotionsByLanguage[language](word)
@@ -19,3 +23,12 @@ class EmotionLexiconRepository(BaseRepository[EmotionLexicon]):
 
     def _getEmotionsSpanish(self, word: str):
         return EmotionLexicon.query.filter(EmotionLexicon.spanish == word).first()
+
+    def getEmotionsOfATopic(self, topic: [str], language: Language):
+        return self.getEmotionsByLanguageAndTopic[language](topic)
+
+    def _getEmotionsOfATopicInEnglish(self, topic:[str]):
+        return EmotionLexicon.query.filter(EmotionLexicon.english.in_(topic)).all()
+
+    def _getEmotionsOfATopicInSpanish(self, topic:[str]):
+        return EmotionLexicon.query.filter(EmotionLexicon.spanish.in_(topic)).all()

@@ -37,11 +37,7 @@ class EmotionAnalyzerController(Resource):
         algorithm = request.json['algorithm']
         threshold = request.json['threshold']
         sa = EmotionAnalyzer()
-        if(not reportId or not algorithm or not threshold):
-            sa.analyzeEmotionsUnfiltered(topicTitle=topicTitle)
-        else:
-            sa.analyzeEmotions(topicTitle=topicTitle, reportId=reportId,
-                                algorithm=algorithm, threshold=threshold)
+        sa.analyzeEmotions(topicTitle=topicTitle, reportId=reportId,algorithm=algorithm, threshold=threshold)
 
 
 @api.route("/download")
@@ -56,3 +52,19 @@ class EmotionsDownloadController(Resource):
         topicTitle = request.args.get('topicTitle', "", type=str)
         sa = EmotionAnalyzer()
         return sa.getEmotionsToDownload(topicTitle=topicTitle)
+
+
+@api.route("/topic")
+class TestController(Resource):
+    @login_required
+    @api.doc(params={'topicTitle': 'Topic Title', 'reportId': 'Report id', 'algorithm': 'Algorithm', 'threshold': 'Threshold'})
+    def get(self):
+        """
+        Returns all the tweets and emotions belonging to a topic as a whole
+        """
+        topicTitle = request.args.get('topicTitle', "", type=str)
+        reportId = request.args.get('reportId', 0, type=int)
+        algorithm = request.args.get('algorithm', "", type=str)
+        threshold = request.args.get('threshold', 0, type=float)
+        sa = EmotionAnalyzer()
+        return sa.getEmotionsOfATopic(topicTitle=topicTitle, reportId=reportId, algorithm=algorithm, threshold=threshold)
