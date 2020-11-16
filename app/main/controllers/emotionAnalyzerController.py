@@ -55,7 +55,7 @@ class EmotionsDownloadController(Resource):
 
 
 @api.route("/topic")
-class TestController(Resource):
+class TopicEmotionAnalyzerController(Resource):
     @login_required
     @api.doc(params={'topicTitle': 'Topic Title', 'reportId': 'Report id', 'algorithm': 'Algorithm', 'threshold': 'Threshold'})
     def get(self):
@@ -68,3 +68,4 @@ class TestController(Resource):
         threshold = request.args.get('threshold', 0, type=float)
         sa = EmotionAnalyzer()
         return sa.getEmotionsOfATopic(topicTitle=topicTitle, reportId=reportId, algorithm=algorithm, threshold=threshold)
+

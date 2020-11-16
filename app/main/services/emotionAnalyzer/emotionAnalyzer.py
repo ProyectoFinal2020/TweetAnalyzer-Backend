@@ -25,12 +25,47 @@ class EmotionAnalyzer:
                          "fear", "joy", "sadness", "surprise", "trust"]
         self.languageDict = {"en": Language.ENGLISH, "es": Language.SPANISH}
 
+        
+    def _getLemmas(self, language, topicTitle, reportId, algorithm, threshold):
+        lemmas = []
+        self.tweets_with_lemmas = []
+        if(reportId == 0 or algorithm == "" or threshold == 0):
+            userStreamingTweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
+        else:
+            userStreamingTweets = self.tweetWithScoresRepository.getAllTweetsWithScoresFilteredByThreshold(topicTitle, reportId, algorithm, threshold)
+        for tweet in userStreamingTweets:
+            if (reportId != 0 and algorithm != "" and threshold != 0):
+                tweet = tweet.userStreamingTweets
+            tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
+            tweet_with_lemma = []
+            for token in tweet_tokenized:
+                lemma = lemmatize(token, language)
+                lemmas.append(lemma)
+                tweet_with_lemma.append(lemma)
+            tweet.text = ' '.join(tweet_with_lemma)
+            self.tweets_with_lemmas.append(tweet)
+        return lemmas
+
+    def _getEmotionsFromLexicon(self, topicTitle, reportId, algorithm, threshold=0):
+        language = getLanguage(topicTitle)
+        lemmas = self._getLemmas(language, topicTitle, reportId, algorithm, threshold)
+        words_with_emotions = self.emotionLexiconRepository.getEmotionsOfATopic(lemmas, self.languageDict[language])
+        self.lemma_with_emotions_dict = {}
+        for word_with_emotion in words_with_emotions:
+            if language == "es":
+               self.lemma_with_emotions_dict[word_with_emotion.spanish] = word_with_emotion
+            else:
+                self.lemma_with_emotions_dict[word_with_emotion.english] = word_with_emotion
+        return words_with_emotions
+
     def _getEmotion(self, token, language):
-        emotionLexicon = self.emotionLexiconRepository.getEmotions(
-            token, language=self.languageDict[language])
+        try:
+            entry = self.lemma_with_emotions_dict[token]
+        except:
+            entry = None
         emotions = []
-        if emotionLexicon:
-            for attr, value in emotionLexicon.__dict__.items():
+        if entry:
+            for attr, value in entry.__dict__.items():
                 if (attr in self.emotions) and (value == 1):
                     emotions.append(attr)
         return emotions
@@ -47,18 +82,10 @@ class EmotionAnalyzer:
 
     def analyzeEmotions(self, topicTitle, reportId, algorithm, threshold=0):
         self._clearData(topicTitle)
+        self.lexicon = self._getEmotionsFromLexicon(topicTitle,reportId, algorithm, threshold)
         language = getLanguage(topicTitle)
-        if(not reportId or not algorithm or not threshold):
-            userStreamingTweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
-        else:
-            userStreamingTweets = self.tweetWithScoresRepository.getAllTweetsWithScoresFilteredByThreshold(
-                topicTitle, reportId, algorithm, threshold)
-        for tweet in userStreamingTweets:
-            if (reportId and algorithm and threshold):
-                tweet = tweet.userStreamingTweets
-            tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
-            tweet_lematized = [lemmatize(token, language)
-                               for token in tweet_tokenized]
+        for tweet in self.tweets_with_lemmas:
+            tweet_lematized = tweet.text.split()
             emotions = self._getSentenceEmotion(tweet_lematized, language)
             tweetWithEmotions = TweetWithEmotions(
                 id=tweet.id, user_id=current_user.id, topic_title=topicTitle)
