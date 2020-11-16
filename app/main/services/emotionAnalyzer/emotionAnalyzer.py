@@ -11,9 +11,8 @@ from ...repositories.unitOfWork import unitOfWork
 from ..common.data_preprocessing import tokenize_and_preprocess, lemmatize
 from flask_login import current_user
 from ..common.getLanguage import getLanguage
-
+from bunch import Bunch
 import json
-
 
 class EmotionAnalyzer:
     def __init__(self):
@@ -42,8 +41,8 @@ class EmotionAnalyzer:
                 lemma = lemmatize(token, language)
                 lemmas.append(lemma)
                 tweet_with_lemma.append(lemma)
-            tweet.text = ' '.join(tweet_with_lemma)
-            self.tweets_with_lemmas.append(tweet)
+            aux = Bunch(id=tweet.id, lemmas=tweet_with_lemma)
+            self.tweets_with_lemmas.append(aux)
         return lemmas
 
     def _getEmotionsFromLexicon(self, topicTitle, reportId, algorithm, threshold=0):
@@ -56,15 +55,11 @@ class EmotionAnalyzer:
                self.lemma_with_emotions_dict[word_with_emotion.spanish] = word_with_emotion
             else:
                 self.lemma_with_emotions_dict[word_with_emotion.english] = word_with_emotion
-        return words_with_emotions
 
     def _getEmotion(self, token, language):
-        try:
-            entry = self.lemma_with_emotions_dict[token]
-        except:
-            entry = None
         emotions = []
-        if entry:
+        if token in self.lemma_with_emotions_dict:
+            entry = self.lemma_with_emotions_dict[token]
             for attr, value in entry.__dict__.items():
                 if (attr in self.emotions) and (value == 1):
                     emotions.append(attr)
@@ -82,11 +77,10 @@ class EmotionAnalyzer:
 
     def analyzeEmotions(self, topicTitle, reportId, algorithm, threshold=0):
         self._clearData(topicTitle)
-        self.lexicon = self._getEmotionsFromLexicon(topicTitle,reportId, algorithm, threshold)
+        self._getEmotionsFromLexicon(topicTitle,reportId, algorithm, threshold)
         language = getLanguage(topicTitle)
         for tweet in self.tweets_with_lemmas:
-            tweet_lematized = tweet.text.split()
-            emotions = self._getSentenceEmotion(tweet_lematized, language)
+            emotions = self._getSentenceEmotion(tweet.lemmas, language)
             tweetWithEmotions = TweetWithEmotions(
                 id=tweet.id, user_id=current_user.id, topic_title=topicTitle)
             for emotion in emotions:
@@ -126,9 +120,9 @@ class EmotionAnalyzer:
             tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
             for token in tweet_tokenized:
                 lemma = lemmatize(token, language)
-                try:
+                if lemma in lemmas_dict:
                     lemmas_dict[lemma] = lemmas_dict[lemma] + 1                 
-                except KeyError:
+                else:
                     lemmas_dict[lemma] = 1
         return lemmas_dict
 
@@ -140,8 +134,9 @@ class EmotionAnalyzer:
             lemmas_emotions_dict[emotion] = 0
         words_with_emotions = self.emotionLexiconRepository.getEmotionsOfATopic(lemmas_dict.keys(), self.languageDict[language])
         for word in words_with_emotions:
-            frequency =  lemmas_dict[word.english]
+            frequency =  lemmas_dict[word.english if language=="en" else word.spanish]
             for attr, value in word.__dict__.items():
                 if (attr in self.emotions) and (value == 1):
-                    lemmas_emotions_dict[attr] = lemmas_emotions_dict[attr] + frequency
+                    if attr in lemmas_emotions_dict:
+                        lemmas_emotions_dict[attr] = lemmas_emotions_dict[attr] + frequency
         return lemmas_emotions_dict
