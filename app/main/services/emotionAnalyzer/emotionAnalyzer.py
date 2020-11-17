@@ -134,9 +134,10 @@ class EmotionAnalyzer:
             lemmas_emotions_dict[emotion] = 0
         words_with_emotions = self.emotionLexiconRepository.getEmotionsOfATopic(lemmas_dict.keys(), self.languageDict[language])
         for word in words_with_emotions:
-            frequency =  lemmas_dict[word.english if language=="en" else word.spanish]
+            lemma = word.english if language=="en" else word.spanish
+            if lemma in lemmas_dict:
+                frequency =  lemmas_dict[lemma]
             for attr, value in word.__dict__.items():
-                if (attr in self.emotions) and (value == 1):
-                    if attr in lemmas_emotions_dict:
-                        lemmas_emotions_dict[attr] = lemmas_emotions_dict[attr] + frequency
+                if (attr in self.emotions) and (value == 1) and attr in lemmas_emotions_dict:
+                    lemmas_emotions_dict[attr] = lemmas_emotions_dict[attr] + frequency
         return lemmas_emotions_dict

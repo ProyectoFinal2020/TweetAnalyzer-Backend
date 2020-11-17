@@ -105,7 +105,6 @@ def tokenizer_with_stemmer(text, language):
 
 
 def tokenize_and_preprocess(text, language):
-    text = unidecode(text)
     text = text.lower()
     text = remove_links(text)
     text = remove_users(text)
