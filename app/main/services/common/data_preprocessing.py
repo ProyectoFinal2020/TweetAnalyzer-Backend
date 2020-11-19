@@ -9,6 +9,8 @@ from spacy import load
 from unidecode import unidecode
 
 languageDict = {"en": "english", "es": "spanish"}
+# To-Do: Ver que pasa con el 1, que de vez en cuando aparece. 
+punctuation = string.punctuation + r"""¡¿—“•”’"""
 
 
 def clean_text(text):
@@ -47,7 +49,7 @@ def preprocess(text):
     text = remove_links(text.lower())
     text = remove_users(text)
     text = clean_text(text)
-    for item in list(string.punctuation):
+    for item in list(punctuation):
         text = text.replace(item, " ")
     return text
 
@@ -108,7 +110,7 @@ def tokenize_and_preprocess(text, language):
     text = text.lower()
     text = remove_links(text)
     text = remove_users(text)
-    for item in list(string.punctuation):
+    for item in list(punctuation):
         text = text.replace(item, " ")
     text_tokenized = tokenizer(text, language)
     return text_tokenized
