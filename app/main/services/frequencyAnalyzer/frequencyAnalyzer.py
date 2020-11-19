@@ -8,26 +8,37 @@ from .frequencyAnalyzerMerger import merge
 class FrequencyAnalyzer:
     def __init__(self):
         self.userStreamingTweetsRepository = unitOfWork.getUserStreamingTweetsRepository()
+        self.tweetWithScoresRepository = unitOfWork.getTweetWithScoresRepository()
 
-    def getWordsCount(self, topic_title):
-        tweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topic_title)
-        language = getLanguage(topic_title)
+    def getWordsCount(self, topicTitle, reportId, algorithm, threshold):
+        if(reportId == 0 or algorithm == "" or threshold == 0):
+            tweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
+        else:
+            tweets = self.tweetWithScoresRepository.getAllTweetsWithScoresFilteredByThreshold(topicTitle, reportId, algorithm, threshold)
+        language = getLanguage(topicTitle)
         wordsCount = {}
         for tweet in tweets:
+            if (reportId != 0 and algorithm != "" and threshold != 0):
+                tweet = tweet.userStreamingTweets
             tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
             tweet_lemmatized = [lemmatize(token, language)
                                for token in tweet_tokenized]
             for lemma in tweet_lemmatized:
-                try:
+                if lemma in wordsCount:
                     wordsCount[lemma] = wordsCount[lemma] + 1                 
-                except KeyError:
+                else:
                     wordsCount[lemma] = 1
         return merge(wordsCount)
 
-    def getHashtagsCount(self, topic_title):
-        tweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topic_title)
+    def getHashtagsCount(self, topicTitle, reportId, algorithm, threshold):
+        if(reportId == 0 or algorithm == "" or threshold == 0):
+            tweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
+        else:
+            tweets = self.tweetWithScoresRepository.getAllTweetsWithScoresFilteredByThreshold(topicTitle, reportId, algorithm, threshold)
         hashtagsCount = {}
         for tweet in tweets:
+            if (reportId != 0 and algorithm != "" and threshold != 0):
+                tweet = tweet.userStreamingTweets
             hashtags = tweet.hashtags.split()
             for hashtag in hashtags:
                 if hashtag in hashtagsCount:
