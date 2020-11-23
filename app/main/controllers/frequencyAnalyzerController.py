@@ -7,13 +7,12 @@ from flask_restx import Resource
 api = FrequencyAnalyzerDto.api
 chartValues = FrequencyAnalyzerDto.chartValues
 
-    
 
 @api.route('')
 class FrequencyAnalyzerController(Resource):
     @login_required
     @api.doc(params={'topicTitle': 'Topic Title', 'reportId': 'Report id', 'algorithm': 'Algorithm', 'threshold': 'Threshold'})
-    @api.marshal_list_with(chartValues) 
+    @api.marshal_list_with(chartValues)
     def get(self):
         """
         Returns an array of words with its frequency
@@ -25,11 +24,12 @@ class FrequencyAnalyzerController(Resource):
         frequencyAnalyzer = FrequencyAnalyzer()
         return frequencyAnalyzer.getWordsCount(topicTitle, reportId, algorithm, threshold)
 
+
 @api.route('/hashtags')
 class FrequencyAnalyzerController(Resource):
     @login_required
     @api.doc(params={'topicTitle': 'Topic Title', 'reportId': 'Report id', 'algorithm': 'Algorithm', 'threshold': 'Threshold'})
-    @api.marshal_list_with(chartValues) 
+    @api.marshal_list_with(chartValues)
     def get(self):
         """
         Returns an array of hashtags with its ammount of repetitions

@@ -8,10 +8,13 @@ class TweetWithScoresRepository(BaseRepository[TweetWithScores]):
     def __init__(self):
         super().__init__(TweetWithScores)
 
-    def getAllTweetsWithScoresFilteredByThreshold(self, topicTitle, reportId, algorithm, threshold):
-        return self.model.query. \
+    def getAllTweetsWithScoresFilteredByThreshold(self, topicTitle, reportId, algorithm, threshold, all=False):
+        tweets = self.model.query. \
             filter(TweetWithScores.topic_title == topicTitle, TweetWithScores.report_id == reportId,
-                   TweetWithScores.user_id == current_user.id, getattr(TweetWithScores, algorithm) >= threshold).all()
+                   TweetWithScores.user_id == current_user.id, getattr(TweetWithScores, algorithm) >= threshold)
+        if all:
+            return tweets.all()
+        return tweets
 
     def _getTweetsWithScores(self, topicTitle, reportId):
         return self.model.query.filter_by(user_id=current_user.id, topic_title=topicTitle, report_id=reportId)
