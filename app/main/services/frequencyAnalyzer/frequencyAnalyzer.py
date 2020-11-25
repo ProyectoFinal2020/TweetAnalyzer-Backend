@@ -11,14 +11,15 @@ class FrequencyAnalyzer:
         self.tweetWithScoresRepository = unitOfWork.getTweetWithScoresRepository()
 
     def getWordsCount(self, topicTitle, reportId, algorithm, threshold):
-        if(reportId == 0 or algorithm == "" or threshold == 0):
+        unfiltered = reportId == 0 or algorithm == "" or threshold == 0
+        if unfiltered:
             tweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
         else:
             tweets = self.tweetWithScoresRepository.getAllTweetsWithScoresFilteredByThreshold(topicTitle, reportId, algorithm, threshold)
         language = getLanguage(topicTitle)
         wordsCount = {}
         for tweet in tweets:
-            if (reportId != 0 and algorithm != "" and threshold != 0):
+            if not unfiltered:
                 tweet = tweet.userStreamingTweets
             tweet_tokenized = tokenize_and_preprocess(tweet.text, language)
             tweet_lemmatized = [lemmatize(token, language)
@@ -31,13 +32,14 @@ class FrequencyAnalyzer:
         return merge(wordsCount)
 
     def getHashtagsCount(self, topicTitle, reportId, algorithm, threshold):
-        if(reportId == 0 or algorithm == "" or threshold == 0):
+        unfiltered = reportId == 0 or algorithm == "" or threshold == 0
+        if(unfiltered):
             tweets = self.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
         else:
             tweets = self.tweetWithScoresRepository.getAllTweetsWithScoresFilteredByThreshold(topicTitle, reportId, algorithm, threshold)
         hashtagsCount = {}
         for tweet in tweets:
-            if (reportId != 0 and algorithm != "" and threshold != 0):
+            if not unfiltered:
                 tweet = tweet.userStreamingTweets
             hashtags = tweet.hashtags.split()
             for hashtag in hashtags:
