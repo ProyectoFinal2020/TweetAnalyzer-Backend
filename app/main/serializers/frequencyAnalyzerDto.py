@@ -4,5 +4,5 @@ class FrequencyAnalyzerDto:
     api = Namespace('frequencyAnalyzer', description='Operations related to the frequency analysis')
     chartValues = api.model('ChartValues', {
         'label': fields.String(),
-        'value': fields.String()
+        'value': fields.Integer()
     })
