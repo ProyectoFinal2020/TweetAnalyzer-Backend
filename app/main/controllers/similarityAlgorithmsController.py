@@ -16,7 +16,7 @@ class SimilarityAlgorithmsController(Resource):
     @login_required
     @api.marshal_with(paginatedTweetWithScores)
     @api.doc(params={'page': 'Page number', 'per_page': 'Tweets per page',
-                     'orderBy': 'Prop to order by', 'desc': ' Desc',
+                     'orderBy': 'Prop to order by', 'desc': 'Descending order',
                      'topicTitle': 'Topic Title', 'reportId': 'Report id',
                      'algorithms': 'Algorithms'})
     def get(self):
