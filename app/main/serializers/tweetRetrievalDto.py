@@ -12,14 +12,3 @@ class TweetRetrievalDto:
         'until': fields.Date(description=""),
         'language': fields.String(description="")
     })
-    topicAndSpaceUsed = api.model('TopicAndSpaceUsed', {
-        'topic': fields.String(description="Tweet's topic"),
-        'spaceUsed': fields.String(description="Number of tweets about the current topic saved in the database"),
-        'language': fields.String(description="Language of the topic")
-    })
-    userMemorySpace = api.model('UserMemorySpace', {
-        'availableSpace': fields.Integer(description="Number of new tweets the user can save in the database"),
-        'spaceUsed': fields.Integer(description="Number of tweets the user saved in the database"),
-        'additionalInformation': fields.List(fields.Nested(topicAndSpaceUsed),
-                                             description="Additional information about the storage usage")
-    })

@@ -7,6 +7,6 @@ class UserMemorySpace:
 
 class TopicAndSpaceUsed:
     def __init__(self, topic: str, spacedUsed: int, language: str):
-        self.topic = topic
+        self.topic_title = topic
         self.spaceUsed = spacedUsed
         self.language = language

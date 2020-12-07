@@ -10,7 +10,6 @@ from flask_login import login_required, current_user
 from flask_restplus import Resource
 
 api = TweetRetrievalDto.api
-userMemorySpace = TweetRetrievalDto.userMemorySpace
 twitterQuery = TweetRetrievalDto.twitterQuery
 
 ts = TweetsService()
@@ -24,14 +23,6 @@ def _getDate(date: str):
 
 @api.route("")
 class TweetRetrievalController(Resource):
-    @login_required
-    @api.marshal_with(userMemorySpace)
-    def get(self):
-        """
-        Gets the available space and the space used by the current user
-        """
-        return ts.getUserMemorySpaceInformation()
-
     @login_required
     @api.expect(twitterQuery)
     def post(self):
