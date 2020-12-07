@@ -10,7 +10,7 @@ from unidecode import unidecode
 
 languageDict = {"en": "english", "es": "spanish"}
 # To-Do: Ver que pasa con el 1, que de vez en cuando aparece. 
-punctuation = string.punctuation + r"""¡¿—“•”’"""
+punctuation = string.punctuation + r"""¡¿—“•”’‘"""
 
 
 def clean_text(text):
