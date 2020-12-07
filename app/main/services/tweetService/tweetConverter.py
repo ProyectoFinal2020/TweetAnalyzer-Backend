@@ -2,6 +2,9 @@ from textblob import TextBlob
 
 
 class TweetConverter:
+    def __init__(self, language):
+        self.language = language
+
     def getId(self, status):
         return status.id_str
 
@@ -66,4 +69,6 @@ class TweetConverter:
 
     def getEmotion(self, status):
         blob = TextBlob(status.full_text)
+        if self.language == 'es':
+            blob = blob.translate(to='en')
         return blob.sentiment

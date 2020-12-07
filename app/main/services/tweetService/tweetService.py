@@ -33,7 +33,7 @@ class TweetsService:
 
     def getTweetsFromAPI(self, topic_title: str, search_tags: list, language: str, since: date, until: date, maxAmount: int):
         self._createTweetsTopic(topic_title, language)
-        tweetBuilder = TweetBuilder(TweetConverter())
+        tweetBuilder = TweetBuilder(TweetConverter(language))
         tags = " OR ".join(search_tags)
         date_since = since.strftime("%Y-%m-%d")
         date_until = until.strftime("%Y-%m-%d")

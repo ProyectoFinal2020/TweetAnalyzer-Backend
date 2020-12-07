@@ -12,13 +12,15 @@ from gensim.models import Word2Vec, KeyedVectors
 from gensim.models import WordEmbeddingSimilarityIndex
 from gensim.similarities import SparseTermSimilarityMatrix
 from ...repositories.unitOfWork import unitOfWork
+from ...settings import SPANISHWORD2VEC
 
 
 class Initializer:
     def __init__(self, reportId, topicTitle, language):
         self.language = language
         self.report = unitOfWork.reportRepository.getById(reportId).content
-        self.tweets = unitOfWork.userStreamingTweetsRepository.getAllByTopicTitle(topicTitle)
+        self.tweets = unitOfWork.userStreamingTweetsRepository.getAllByTopicTitle(
+            topicTitle)
         self.initializeAndPreprocessDocuments(language)
         self.initializeDictionary()
         self.initializeTfIdf()
@@ -44,8 +46,8 @@ class Initializer:
             self.w2v_model = api.load("glove-wiki-gigaword-50")
         else:
             self.w2v_model = KeyedVectors.load_word2vec_format(
-                    os.getenv('SPANISHWORD2VEC'), binary=True)
-                    
+                SPANISHWORD2VEC, binary=True)
+
     def initializeSimilarityMatrix(self):
         self.similarity_index = WordEmbeddingSimilarityIndex(self.w2v_model)
         self.similarity_matrix = SparseTermSimilarityMatrix(
